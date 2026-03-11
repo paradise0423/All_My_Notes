@@ -1,19 +1,18 @@
 # MAOS - 终端多智能体操作系统
 
-本项目是一个面向终端/本地环境的多智能体系统示例，核心能力包括：系统级协调、多应用级代理、工具化能力接入，以及基于本地数据的个性化“soul”信号读取与更新。
+本项目是一个面向终端的多智能体操作，核心能力包括：系统级协调、多应用级代理、工具化能力接入，以及基于本地数据的个性化信息使用与维护。
 
 # 系统架构
 
 系统由三层核心构成：
+
+- **用户交互层**：
 
 - **系统级 Agent 层**：负责任务拆解、协调与治理。  
   代码位置：`agents/coordinate_agent.py`、`agents/task_agent.py`、`agents/soul_agent.py`、`agents/document_agent.py`、`agents/developer_agent.py`
 
 - **应用级 Agent 层**：按应用/业务域封装能力。  
   代码位置：`agents/contactors_agent.py`、`agents/notes_agent.py`、`agents/photos_agent.py`、`agents/xiaohongshu_agent.py`、`agents/xiecheng_agent.py`、`agents/search_agent.py`
-
-- **Toolkit 层**：将具体数据或功能封装为可调用工具。  
-  代码位置：`tools/`
 
 统一的模型入口在 `agents/backend_model.py`，通过 `ModelFactory.create()` 创建 `BaseModelBackend` 的具体实现，再注入 `ChatAgent`。
 
@@ -45,18 +44,17 @@
 
 在 AIOS 中，**App-Level Agent（应用级代理）**用于表示系统中的具体应用，例如 Notes、Contactors、Photos 等。每个 App-Level Agent 封装了与某个应用相关的能力，用于处理应用数据，向系统级 Agent 返回结果，等等。
 
-App-Level Agent 可以理解为 **AIOS 多代理系统与应用之间的接口层**，系统级 Agent 通过调用 App-Level Agent，从而访问不同应用的数据与能力。
+App-Level Agent 可视为为 **AIOS 多代理系统与应用之间的接口层**，系统级 Agent 通过调用 App-Level Agent，从而访问不同应用的数据与能力。
 
 
 ### 2、架构设计
 
 所有 App-Level Agent 都基于 `camel-master/camel/agents/chat_agent.py` 中的 `ChatAgent` 类构建，以 `Function` 形式封装，命名方式遵循 `xxx_agent_factory()` 的方式，在函数内部完成 Agent 的配置与初始化，最终返回一个 `ChatAgent` 实例。
 
-**Classes**
+***Classes***
 
-ChatAgent  :Agent 核心部分，负责模型调用、工具调用与消息编排。
-    **Args:**
-    
+**ChatAgent**  :  Agent 核心部分，负责模型调用、工具调用与消息编排。
+    ***Args:***
     <table style="border-collapse:collapse; width:100%; font-size:14px;">
       <thead>
         <tr>
@@ -115,8 +113,8 @@ ChatAgent  :Agent 核心部分，负责模型调用、工具调用与消息编�
     </table>
 
 
-BaseMessage  :消息基类，用于构造系统/用户/助手等角色消息。
-    **Args:**
+**BaseMessage**  :  消息基类，用于构造系统/用户/助手等角色消息。
+    ***Args:***
     <table style="border-collapse:collapse; width:100%; font-size:14px;">
       <thead>
         <tr>
@@ -150,8 +148,8 @@ BaseMessage  :消息基类，用于构造系统/用户/助手等角色消息。
     </table>
 
 
-ModelFactory  :模型工厂，用于统一创建模型后端实例。
-    **Args:**
+**ModelFactory**  :  模型工厂，用于统一创建模型后端实例。
+    ***Args:***
     <table style="border-collapse:collapse; width:100%; font-size:14px;">
       <thead>
         <tr>
@@ -209,19 +207,7 @@ ModelFactory  :模型工厂，用于统一创建模型后端实例。
       </tbody>
     </table>
 
----
-
-### 3、基座模型配置
-
-基座模型统一来自 `agents/backend_model.py` 的 `backend_model()`。  
-该函数从环境变量读取密钥与服务地址，并创建 OpenAI 平台的 `GPT_5_NANO` 模型实例。
-
-关键点：
-- 依赖环境变量：`OPENAI_API_KEY`、`url`
-- 模型平台：`ModelPlatformType.OPENAI`
-- 模型类型：`ModelType.GPT_5_NANO`
-
-### 4、最小示例
+### 3、示例
 
 ```python
 from camel.agents.chat_agent import ChatAgent
@@ -246,60 +232,3 @@ def example_agent_factory():
 ```
 
 ## 新增 Toolkit
-
-### 1、概述
-
-Toolkit 用于封装应用能力为可调用工具，并通过 `get_tools()` 暴露给 Agent。  
-所有 Toolkit 继承自 `BaseToolkit`，工具函数由 `FunctionTool` 包装并自动生成 schema。
-
-### 2、项目内 Toolkit 列表
-
-**SoulToolkit**（`tools/soul_toolkit.py`）  
-用于读写 soul 档案与任务状态。
-
-Tools:
-- `get_user_soul()`：读取 `mock_data/soul/soul.md`
-- `get_task_status()`：读取 `working_dir/task_status.md`
-- `save_soul(new_soul: str)`：写入 `mock_data/soul/soul_new.md`
-- `announce_tool()`：声明无需更新 soul
-
-**ContactorsRetrievalToolkit**（`tools/contactors_toolkit.py`）  
-联系人/通话记录读取工具（只读 mock 数据）。
-
-Tools:
-- `search_my_contactors()`：返回联系人 JSON（全量）
-- `get_contactors_soul(query: str)`：返回联系人应用的个性化信号
-
-**NotesRetrievalToolkit**（`tools/notes_toolkit.py`）  
-备忘录读取工具（只读 mock 数据）。
-
-Tools:
-- `search_my_notes()`：返回笔记 JSON（全量）
-- `get_notes_soul(query: str)`：返回备忘录应用的个性化信号
-
-**PhotosToolkit**（`tools/photos_toolkit.py`）  
-照片检索与图像分析工具。
-
-Tools:
-- `search_photos()`：返回照片 JSON（全量）
-- `get_image_information(image_path: str, user_message: Optional[str] = None)`：图像分析
-- `get_photos_soul(query: str)`：返回相册应用的个性化信号
-
-**XiaoHongShuToolkit**（`tools/xiaohongshu_toolkit.py`）  
-小红书内容发布工具（写入本地 mock 输出）。
-
-Tools:
-- `publish_xhs_post(title: str, text: str, image_paths: list[str])`：生成并保存帖子 JSON
-- `get_xiaohongshu_soul(query: str)`：返回小红书应用的个性化信号
-
-**XiechengToolkit**（`tools/xiecheng_toolkit.py`）  
-旅行数据检索工具（景点/攻略/订单）。
-
-Tools:
-- `search_attractions()`：景点数据（全量）
-- `search_guides()`：攻略数据（全量）
-- `search_orders()`：订单数据（全量）
-- `get_xiecheng_soul(query: str)`：返回携程应用的个性化信号
-
-- `check_storage(limit: int = None)`：查看存量 payload
-- `delete_or_reset_collection(collectionname: str = None, reset: bool = False)`：清空或删除集合
