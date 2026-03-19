@@ -1,4 +1,2 @@
-1、 MAOS项目，系统的documentation，参考：AutoGen
-   MAOS documentation
-2、合同信息提取助手，智能体的prompt
-   Contract information extraction assistant, prompt for intelligent agents
+- 1、 MAOS项目，系统的documentation，参考：AutoGen (MAOS documentation)
+- 2、合同信息提取助手，智能体的prompt (Contract information extraction assistant, prompt for intelligent agents)
