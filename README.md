@@ -2,4 +2,4 @@
 - 2、合同信息提取助手，智能体的prompt。数字越大，版本越老。
   
 - 1. MAOS documentation
-- 2.Contract information extraction assistant, prompt for intelligent agents. The larger the number, the older the version.
+- 2. Contract information extraction assistant, prompt for intelligent agents. The larger the number, the older the version.
